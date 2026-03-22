@@ -109,6 +109,9 @@ border-bottom: 2px solid rgb(242, 242, 242)</string>
             <fontweight>Light</fontweight>
            </font>
           </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+          </property>
           <property name="styleSheet">
            <string notr="true">QListView {
     show-decoration-selected: 1; /* make the selection span the entire width of the view */

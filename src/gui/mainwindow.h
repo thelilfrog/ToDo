@@ -25,11 +25,15 @@ private slots:
     void openCreateListDialog(bool);
     void onListCreated(List value);
     void onListUpdate(List value);
+    void onListDeleted(QUuid uuid);
     void onNoteCreated(Note value);
     void onNoteUpdated(Note value);
     void onListSelected(int i);
     void onSaveNoteButtonClicked(bool);
     void onNoteChanged(QListWidgetItem*);
+    void onListRightClick(const QPoint &pos);
+    void onListContextMenuDelete(bool);
+    void onListContextMenuRename(bool);
 
 private:
     Ui::MainWindow *ui;

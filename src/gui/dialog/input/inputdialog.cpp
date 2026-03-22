@@ -10,6 +10,16 @@ InputDialog::InputDialog(QWidget *parent, QString title, QString headline, QStri
     ui->message->setText(message);
 }
 
+InputDialog::InputDialog(QWidget *parent, QString title, QString headline, QString message, QString content) : QDialog(parent), ui(new Ui::InputDialog)
+{
+    ui->setupUi(this);
+    this->setWindowTitle(title);
+    ui->errorLabel->setVisible(false);
+    ui->headline->setText(headline);
+    ui->message->setText(message);
+    ui->lineEdit->setText(content);
+}
+
 InputDialog::~InputDialog()
 {
     delete ui;

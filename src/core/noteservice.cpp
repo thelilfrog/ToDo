@@ -153,7 +153,13 @@ QString NoteService::update(QUuid listUuid, QUuid noteUuid, QString newValue)
         throw std::runtime_error("Note not found");
     }
 
-    Note n = Note(listUuid, noteUuid, newValue, false);
+    std::optional<Note> note = getByUUID(noteUuid);
+
+    if (!note.has_value()) {
+        throw std::runtime_error("database integrity corrupted");
+    }
+
+    Note n = Note(listUuid, noteUuid, newValue, note.value().isFinished());
     emit onNoteUpdated(n);
     return newValue;
 }

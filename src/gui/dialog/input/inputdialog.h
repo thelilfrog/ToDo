@@ -14,6 +14,7 @@ class InputDialog : public QDialog
 
 public:
     InputDialog(QWidget *parent, QString title, QString headline, QString message);
+    InputDialog(QWidget *parent, QString title, QString headline, QString message, QString content);
     ~InputDialog();
 
     QString getInput();

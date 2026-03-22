@@ -6,6 +6,7 @@
 #include "src/core/noteservice.h"
 
 #include <QDialogButtonBox>
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,12 +21,14 @@ MainWindow::MainWindow(QWidget *parent)
     // ui
     connect(ui->addListButton, &QPushButton::clicked, this, &MainWindow::openCreateListDialog);
     connect(ui->lists, &QListWidget::currentRowChanged, this, &MainWindow::onListSelected);
+    connect(ui->lists, &QWidget::customContextMenuRequested, this, &MainWindow::onListRightClick);
     connect(ui->saveNoteButton, &QPushButton::clicked, this, &MainWindow::onSaveNoteButtonClicked);
     connect(ui->notes, &QListWidget::itemChanged, this, &MainWindow::onNoteChanged);
 
     // services
     connect(ListService::getInstance(), &ListService::onListCreated, this, &MainWindow::onListCreated);
-    connect(ListService::getInstance(), &ListService::onListUpdated, this, &MainWindow::onListCreated);
+    connect(ListService::getInstance(), &ListService::onListUpdated, this, &MainWindow::onListUpdate);
+    connect(ListService::getInstance(), &ListService::onListDeleted, this, &MainWindow::onListDeleted);
     connect(NoteService::getInstance(), &NoteService::onNoteCreated, this, &MainWindow::onNoteCreated);
 
     preload();
@@ -63,11 +66,25 @@ void MainWindow::onListCreated(List value)
 void MainWindow::onListUpdate(List value)
 {
     QListWidgetItem *item = nullptr;
-    for (int i = 0; i > ui->lists->count(); i++) {
+    for (int i = 0; i < ui->lists->count(); i++) {
         item = ui->lists->item(i);
 
         if (item->data(Qt::UserRole).toUuid() == value.getUUID()) {
             item->setText(value.getName());
+            return;
+        }
+    }
+}
+
+void MainWindow::onListDeleted(QUuid uuid)
+{
+    QListWidgetItem *item = nullptr;
+    for (int i = 0; i < ui->lists->count(); i++) {
+        item = ui->lists->item(i);
+
+        if (item->data(Qt::UserRole).toUuid() == uuid) {
+            ui->lists->removeItemWidget(item);
+            delete item;
             return;
         }
     }
@@ -97,7 +114,7 @@ void MainWindow::onNoteUpdated(Note value)
         return;
     }
 
-    for (int i = 0; i > ui->notes->count(); i++) {
+    for (int i = 0; i < ui->notes->count(); i++) {
         item = ui->notes->item(i);
 
         if (item->data(Qt::UserRole).toUuid() == value.getUUID()) {
@@ -166,6 +183,48 @@ void MainWindow::onNoteChanged(QListWidgetItem *item)
             service->update(note.getParentUUID(), note.getUUID(), content);
             service->setFinishedValue(note.getParentUUID(), note.getUUID(), item->checkState() == Qt::Checked ? true : false);
         }
+    }
+}
+
+void MainWindow::onListRightClick(const QPoint &pos)
+{
+    if (ui->lists->selectedItems().length() == 1) {
+        QMenu menu(this);
+
+        QAction *renameAction = new QAction(tr("Rename"), this);
+        connect(renameAction, &QAction::triggered, this, &MainWindow::onListContextMenuRename);
+        menu.addAction(renameAction);
+
+        menu.addSeparator();
+
+        QAction *deleteAction = new QAction(tr("Delete"), this);
+        connect(deleteAction, &QAction::triggered, this, &MainWindow::onListContextMenuDelete);
+        menu.addAction(deleteAction);
+
+        menu.exec(ui->lists->mapToGlobal(pos));
+    }
+}
+
+void MainWindow::onListContextMenuDelete(bool _)
+{
+
+}
+
+void MainWindow::onListContextMenuRename(bool)
+{
+    if (ui->lists->selectedItems().length() == 1) {
+        QListWidgetItem *item = ui->lists->selectedItems()[0];
+
+        InputDialog d = InputDialog(this, "Edit", "Edit", "Edit the list's name", item->text());
+        auto res = d.exec();
+
+        // execute, ignore if not saved
+        if (res != QDialog::Accepted) {
+            return;
+        }
+
+        QString newListName = d.getInput();
+        ListService::getInstance()->update(item->data(Qt::UserRole).toUuid(), newListName);
     }
 }
 
