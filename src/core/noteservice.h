@@ -21,8 +21,7 @@ public:
     static NoteService* getInstance();
 
     QUuid create(QUuid listUuid, QString value);
-    QString update(QUuid listUuid, QUuid noteUuid, QString newValue);
-    void setFinishedValue(QUuid listUuid, QUuid noteUuid, bool isFinished);
+    QString update(QUuid listUuid, QUuid noteUuid, QString newValue, bool isFinished);
     void remove(QUuid listUuid, QUuid noteUuid);
 
     QList<Note> getByList(QUuid listUuid);

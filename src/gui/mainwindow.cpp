@@ -7,6 +7,7 @@
 
 #include <QDialogButtonBox>
 #include <QMenu>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->addListButton, &QPushButton::clicked, this, &MainWindow::openCreateListDialog);
     connect(ui->lists, &QListWidget::currentRowChanged, this, &MainWindow::onListSelected);
     connect(ui->lists, &QWidget::customContextMenuRequested, this, &MainWindow::onListRightClick);
+    connect(ui->newNoteEdit, &QLineEdit::returnPressed, this, &MainWindow::onNewNoteEditReturnPressed);
     connect(ui->saveNoteButton, &QPushButton::clicked, this, &MainWindow::onSaveNoteButtonClicked);
     connect(ui->notes, &QListWidget::itemChanged, this, &MainWindow::onNoteChanged);
 
@@ -30,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ListService::getInstance(), &ListService::onListUpdated, this, &MainWindow::onListUpdate);
     connect(ListService::getInstance(), &ListService::onListDeleted, this, &MainWindow::onListDeleted);
     connect(NoteService::getInstance(), &NoteService::onNoteCreated, this, &MainWindow::onNoteCreated);
+    connect(NoteService::getInstance(), &NoteService::onNoteUpdated, this, &MainWindow::onNoteUpdated);
+    connect(NoteService::getInstance(), &NoteService::onNoteDeleted, this, &MainWindow::onNoteDeleted);
 
     preload();
 }
@@ -39,7 +43,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::openCreateListDialog(bool _)
+void MainWindow::openCreateListDialog(bool)
 {
     // create the input dialog
     InputDialog d = InputDialog(this, "Create a list", "New List", "Give a name to this list");
@@ -105,12 +109,10 @@ void MainWindow::onNoteUpdated(Note value)
 {
     QListWidgetItem *item = ui->lists->currentItem();
     if (item == nullptr) {
-        qDebug() << "item null";
         return;
     }
 
     if (item->data(Qt::UserRole).toUuid() != value.getParentUUID()) {
-        qDebug() << "item uuid not matching";
         return;
     }
 
@@ -120,6 +122,30 @@ void MainWindow::onNoteUpdated(Note value)
         if (item->data(Qt::UserRole).toUuid() == value.getUUID()) {
             item->setCheckState((value.isFinished() ? Qt::Checked : Qt::Unchecked));
             item->setText(value.getContent());
+            return;
+        }
+    }
+}
+
+void MainWindow::onNoteDeleted(QUuid listUuid, QUuid noteUuid)
+{
+    QListWidgetItem *item = ui->lists->currentItem();
+    if (item == nullptr) {
+        qDebug() << "item null";
+        return;
+    }
+
+    if (item->data(Qt::UserRole).toUuid() != listUuid) {
+        qDebug() << "item uuid not matching";
+        return;
+    }
+
+    for (int i = 0; i < ui->notes->count(); i++) {
+        item = ui->notes->item(i);
+
+        if (item->data(Qt::UserRole).toUuid() == noteUuid) {
+            ui->notes->removeItemWidget(item);
+            delete item;
             return;
         }
     }
@@ -149,7 +175,7 @@ void MainWindow::onListSelected(int i)
     ui->notes->setEnabled(true);
 }
 
-void MainWindow::onSaveNoteButtonClicked(bool _)
+void MainWindow::onSaveNoteButtonClicked(bool)
 {
     QString content = ui->newNoteEdit->text();
     if (content.isEmpty()) {
@@ -167,6 +193,11 @@ void MainWindow::onSaveNoteButtonClicked(bool _)
     ui->newNoteEdit->clear();
 }
 
+void MainWindow::onNewNoteEditReturnPressed()
+{
+    onSaveNoteButtonClicked(false);
+}
+
 void MainWindow::onNoteChanged(QListWidgetItem *item)
 {
     NoteService *service = NoteService::getInstance();
@@ -180,8 +211,7 @@ void MainWindow::onNoteChanged(QListWidgetItem *item)
         if (content.isEmpty()) {
             service->remove(note.getParentUUID(), note.getUUID());
         } else {
-            service->update(note.getParentUUID(), note.getUUID(), content);
-            service->setFinishedValue(note.getParentUUID(), note.getUUID(), item->checkState() == Qt::Checked ? true : false);
+            service->update(note.getParentUUID(), note.getUUID(), content, item->checkState() == Qt::Checked ? true : false);
         }
     }
 }
@@ -205,9 +235,27 @@ void MainWindow::onListRightClick(const QPoint &pos)
     }
 }
 
-void MainWindow::onListContextMenuDelete(bool _)
+void MainWindow::onListContextMenuDelete(bool)
 {
+    if (ui->lists->selectedItems().length() == 1) {
+        QListWidgetItem *item = ui->lists->selectedItems()[0];
+        QUuid uuid = item->data(Qt::UserRole).toUuid();
 
+        QMessageBox box(this);
+        box.setWindowTitle("Delete");
+        box.setText(QString("Do you want to delete '%1'?").arg(item->text()));
+        box.addButton(QMessageBox::Yes);
+        box.addButton(QMessageBox::Cancel);
+
+        if (box.exec() == QMessageBox::Yes) {
+            NoteService *ns = NoteService::getInstance();
+            QList<Note> toDelete = ns->getByList(uuid);
+            foreach (Note n, toDelete) {
+                ns->onNoteDeleted(uuid, n.getUUID());
+            }
+            ListService::getInstance()->remove(uuid);
+        }
+    }
 }
 
 void MainWindow::onListContextMenuRename(bool)

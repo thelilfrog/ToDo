@@ -136,42 +136,15 @@ QUuid NoteService::create(QUuid listUuid, QString value)
     return newNoteUuid;
 }
 
-QString NoteService::update(QUuid listUuid, QUuid noteUuid, QString newValue)
+QString NoteService::update(QUuid listUuid, QUuid noteUuid, QString newValue, bool isFinished)
 {
     QSqlDatabase db = getOpenDatabase();
 
     QSqlQuery query(db);
-    query.prepare("UPDATE notes SET content = :content WHERE id = :id AND list_id = :list_id;");
+    query.prepare("UPDATE notes SET content = :content, finished = :finished WHERE id = :id AND list_id = :list_id;");
     query.bindValue(":id", toDbUuid(noteUuid));
     query.bindValue(":list_id", toDbUuid(listUuid));
     query.bindValue(":content", newValue);
-
-    if (!query.exec()) {
-        throw makeSqlException("Failed to update note", query.lastError().text());
-    }
-    if (query.numRowsAffected() <= 0) {
-        throw std::runtime_error("Note not found");
-    }
-
-    std::optional<Note> note = getByUUID(noteUuid);
-
-    if (!note.has_value()) {
-        throw std::runtime_error("database integrity corrupted");
-    }
-
-    Note n = Note(listUuid, noteUuid, newValue, note.value().isFinished());
-    emit onNoteUpdated(n);
-    return newValue;
-}
-
-void NoteService::setFinishedValue(QUuid listUuid, QUuid noteUuid, bool isFinished)
-{
-    QSqlDatabase db = getOpenDatabase();
-
-    QSqlQuery query(db);
-    query.prepare("UPDATE notes SET finished = :finished WHERE id = :id AND list_id = :list_id;");
-    query.bindValue(":id", toDbUuid(noteUuid));
-    query.bindValue(":list_id", toDbUuid(listUuid));
     query.bindValue(":finished", isFinished);
 
     if (!query.exec()) {
@@ -181,13 +154,9 @@ void NoteService::setFinishedValue(QUuid listUuid, QUuid noteUuid, bool isFinish
         throw std::runtime_error("Note not found");
     }
 
-    std::optional<Note> note = getByUUID(noteUuid);
-
-    if (!note.has_value()) {
-        throw std::runtime_error("database integrity corrupted");
-    }
-    Note n = Note(listUuid, noteUuid, note.value().getContent(), isFinished);
+    Note n = Note(listUuid, noteUuid, newValue, isFinished);
     emit onNoteUpdated(n);
+    return newValue;
 }
 
 void NoteService::remove(QUuid listUuid, QUuid noteUuid)
