@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ToDo</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(249, 255, 251);</string>
@@ -128,7 +128,7 @@ QListView::item:selected {
 }
 
 QListView::item:selected:!active {
-    background: none;
+    background-color: rgb(170, 216, 130);
 }
 
 QListView::item:selected:active {
@@ -210,6 +210,9 @@ QListView::item:hover {
            </item>
            <item>
             <widget class="QPushButton" name="addListButton">
+             <property name="toolTip">
+              <string>New list</string>
+             </property>
              <property name="styleSheet">
               <string notr="true">border: none;
 padding: 6px;</string>
@@ -231,12 +234,17 @@ padding: 6px;</string>
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="notes">
-        <property name="enabled">
-         <bool>false</bool>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QListView {
+        <item>
+         <widget class="QListWidget" name="notes">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QListView {
     show-decoration-selected: 1; /* make the selection span the entire width of the view */
     background-color: rgb(242, 242, 242);
     border: none;
@@ -245,8 +253,9 @@ padding: 6px;</string>
 }
 
 QListView::item {
-   margin: 2px;
-   padding: 8px;
+   background-color: rgb(231, 231, 231);
+   margin: 10px;
+   padding: 10px;
    border: none;
 }
 
@@ -262,36 +271,90 @@ QListView::item:selected:!active {
     background: none;
 }
 
-QListView::item:selected:active {
-	background-color: rgb(154, 154, 154);
-}
-
 QListView::item:hover {
 	background-color: rgb(204, 204, 204);
 }</string>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Shadow::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-        </property>
-        <property name="showDropIndicator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="defaultDropAction">
-         <enum>Qt::DropAction::IgnoreAction</enum>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
-        </property>
-        <property name="supportedDragActions">
-         <set>Qt::DropAction::IgnoreAction</set>
-        </property>
-       </widget>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Shadow::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>0</number>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::DropAction::IgnoreAction</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+          </property>
+          <property name="supportedDragActions">
+           <set>Qt::DropAction::IgnoreAction</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="newNoteEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">margin: 20px;
+background-color: rgb(243, 243, 243);
+padding: 8px;
+color: rgb(13, 13, 13);
+border: none;</string>
+            </property>
+            <property name="placeholderText">
+             <string>Enter your new note here</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveNoteButton">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(170, 216, 130);
+color: rgb(242, 242, 242);
+border: none;
+padding: 8px;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset theme="QIcon::ThemeIcon::MailSend"/>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

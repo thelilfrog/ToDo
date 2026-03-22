@@ -1,12 +1,12 @@
-QT += widgets
+QT += widgets sql
 
 CONFIG += c++17
 
 QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
 QMAKE_CXXFLAGS += -Werror
 
-win32:VERSION = 3.0.0.0 # major.minor.patch.build
-else:VERSION = 3.0.0    # major.minor.patch
+win32:VERSION = 0.0.1.0 # major.minor.patch.build
+else:VERSION = 0.0.1    # major.minor.patch
 
 DEFINES += APP_VERSION=\"\\\"$${VERSION}\\\"\"
 DEFINES += APP_NAME=\"\\\"ToDo\\\"\"
@@ -70,21 +70,25 @@ linux-* {
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dialog.cpp \
-    list.cpp \
-    listservice.cpp \
-    main.cpp \
-    mainwindow.cpp
+    src/core/noteservice.cpp \
+    src/gui/dialog/input/inputdialog.cpp \
+    src/obj/list.cpp \
+    src/core/listservice.cpp \
+    src/main.cpp \
+    src/gui/mainwindow.cpp \
+    src/obj/note.cpp
 
 HEADERS += \
-    dialog.h \
-    list.h \
-    listservice.h \
-    mainwindow.h
+    src/core/noteservice.h \
+    src/gui/dialog/input/inputdialog.h \
+    src/obj/list.h \
+    src/core/listservice.h \
+    src/gui/mainwindow.h \
+    src/obj/note.h
 
 FORMS += \
-    dialog.ui \
-    mainwindow.ui
+    src/gui/dialog/input/inputdialog.ui \
+    src/gui/mainwindow.ui
 
 TRANSLATIONS += \
     ToDo_en_150.ts

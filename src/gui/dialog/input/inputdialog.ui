@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>InputDialog</class>
+ <widget class="QDialog" name="InputDialog">
   <property name="windowModality">
    <enum>Qt::WindowModality::ApplicationModal</enum>
   </property>
@@ -138,6 +138,16 @@ border: 2px solid rgb(230, 230, 230);</string>
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorLabel">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 89, 92);</string>
+         </property>
+         <property name="text">
+          <string>error</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QDialogButtonBox" name="buttonBox">

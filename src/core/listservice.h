@@ -2,23 +2,18 @@
 #define LISTSERVICE_H
 
 #include <QObject>
-#include <QMap>
+#include <QList>
+#include <QUuid>
 
-#include "list.h"
+#include "src/obj/list.h"
 
-/*
- *
- * ListService is a singleton that query the "lists" over the datasource layer
- *
- */
 class ListService : public QObject
 {
     Q_OBJECT
+
 private:
     ListService();
     static ListService* _instance;
-
-    QMap<qint128,List> store;
 
 public:
     static ListService* getInstance();
@@ -27,11 +22,13 @@ public:
     List update(QUuid uuid, QString newName);
     void remove(QUuid uuid);
 
+    QList<List> getAll();
+    List getByUuid(QUuid uuid);
+
 signals:
     void onListCreated(List value);
     void onListUpdated(List value);
     void onListDeleted(QUuid uuid);
-
 };
 
 #endif // LISTSERVICE_H

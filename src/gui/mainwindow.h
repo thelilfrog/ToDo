@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "list.h"
+#include <QListWidgetItem>
+
+#include "src/obj/list.h"
+#include "src/obj/note.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,9 +24,17 @@ public:
 private slots:
     void openCreateListDialog(bool);
     void onListCreated(List value);
+    void onListUpdate(List value);
+    void onNoteCreated(Note value);
+    void onNoteUpdated(Note value);
+    void onListSelected(int i);
+    void onSaveNoteButtonClicked(bool);
+    void onNoteChanged(QListWidgetItem*);
 
 private:
     Ui::MainWindow *ui;
+
+    void preload();
 
 };
 #endif // MAINWINDOW_H
