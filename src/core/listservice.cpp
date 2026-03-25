@@ -157,7 +157,7 @@ QList<List> ListService::getAll()
     QSqlDatabase db = getOpenDatabase();
 
     QSqlQuery query(db);
-    if (!query.exec("SELECT id, name FROM lists ORDER BY name COLLATE NOCASE ASC;")) {
+    if (!query.exec("SELECT id, name FROM lists ORDER BY id;")) {
         throw makeSqlException("Failed to read lists", query.lastError().text());
     }
 

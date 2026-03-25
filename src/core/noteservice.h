@@ -6,6 +6,7 @@
 #include <QString>
 #include <QUuid>
 #include <optional>
+#include <list>
 
 #include "src/obj/note.h"
 
@@ -24,7 +25,7 @@ public:
     QString update(QUuid listUuid, QUuid noteUuid, QString newValue, bool isFinished);
     void remove(QUuid listUuid, QUuid noteUuid);
 
-    QList<Note> getByList(QUuid listUuid);
+    std::list<Note> getByList(QUuid listUuid);
     std::optional<Note> getByUUID(QUuid noteUuid);
 
 signals:

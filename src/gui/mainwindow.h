@@ -40,7 +40,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    int noteSeparation = -1;
+
     void preload();
+    void updateNoteSeparation();
 
 };
 #endif // MAINWINDOW_H

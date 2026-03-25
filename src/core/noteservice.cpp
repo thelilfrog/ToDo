@@ -175,7 +175,7 @@ void NoteService::remove(QUuid listUuid, QUuid noteUuid)
     emit onNoteDeleted(listUuid, noteUuid);
 }
 
-QList<Note> NoteService::getByList(QUuid listUuid)
+std::list<Note> NoteService::getByList(QUuid listUuid)
 {
     QSqlDatabase db = getOpenDatabase();
 
@@ -187,12 +187,12 @@ QList<Note> NoteService::getByList(QUuid listUuid)
         throw makeSqlException("Failed to read notes by list", query.lastError().text());
     }
 
-    QList<Note> notes;
+    std::list<Note> notes;
     while (query.next()) {
         const QUuid noteId(query.value(0).toString());
         const QString content = query.value(1).toString();
         const bool finished = query.value(2).toBool();
-        notes.append(Note(listUuid, noteId, content, finished));
+        notes.push_back(Note(listUuid, noteId, content, finished));
     }
 
     return notes;

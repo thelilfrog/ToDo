@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QMenu>
 #include <QMessageBox>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -102,7 +103,13 @@ void MainWindow::onNoteCreated(Note value)
     item->setText(value.getContent());
     item->setData(Qt::UserRole, QVariant(value.getUUID()));
 
-    this->ui->notes->addItem(item);
+    if (noteSeparation == -1) {
+        this->ui->notes->addItem(item);
+    } else {
+        this->ui->notes->insertItem(noteSeparation, item);
+    }
+
+    updateNoteSeparation();
 }
 
 void MainWindow::onNoteUpdated(Note value)
@@ -120,23 +127,40 @@ void MainWindow::onNoteUpdated(Note value)
         item = ui->notes->item(i);
 
         if (item->data(Qt::UserRole).toUuid() == value.getUUID()) {
-            item->setCheckState((value.isFinished() ? Qt::Checked : Qt::Unchecked));
+            item->setCheckState(value.isFinished() ? Qt::Checked : Qt::Unchecked);
             item->setText(value.getContent());
+
+            if (ui->notes->count() == 1) {
+                return;
+            }
+
+            if (noteSeparation == -1) {
+                if (item->checkState() == Qt::Checked) {
+                    QListWidgetItem* tmp = ui->notes->takeItem(i);
+                    ui->notes->addItem(tmp);
+                }
+            }
+
+            if ((item->checkState() == Qt::Checked && i < noteSeparation) || (item->checkState() == Qt::Unchecked && i > noteSeparation)) {
+                QListWidgetItem* tmp = ui->notes->takeItem(i);
+                ui->notes->insertItem(noteSeparation-1, tmp);
+            }
+
+            updateNoteSeparation();
             return;
         }
     }
+    updateNoteSeparation();
 }
 
 void MainWindow::onNoteDeleted(QUuid listUuid, QUuid noteUuid)
 {
     QListWidgetItem *item = ui->lists->currentItem();
     if (item == nullptr) {
-        qDebug() << "item null";
         return;
     }
 
     if (item->data(Qt::UserRole).toUuid() != listUuid) {
-        qDebug() << "item uuid not matching";
         return;
     }
 
@@ -146,9 +170,11 @@ void MainWindow::onNoteDeleted(QUuid listUuid, QUuid noteUuid)
         if (item->data(Qt::UserRole).toUuid() == noteUuid) {
             ui->notes->removeItemWidget(item);
             delete item;
+            updateNoteSeparation();
             return;
         }
     }
+    updateNoteSeparation();
 }
 
 void MainWindow::onListSelected(int i)
@@ -158,18 +184,23 @@ void MainWindow::onListSelected(int i)
         ui->newNoteEdit->setDisabled(true);
         ui->saveNoteButton->setDisabled(true);
         ui->notes->setDisabled(true);
+        noteSeparation = -1;
         return;
     }
     QListWidgetItem *item = ui->lists->item(i);
     QVariant uuid = item->data(Qt::UserRole);
 
-    QList<Note> notes = NoteService::getInstance()->getByList(uuid.toUuid());
+    std::list<Note> notes = NoteService::getInstance()->getByList(uuid.toUuid());
+    notes.sort([](Note &a, Note &b){
+        return a.isFinished() < b.isFinished();
+    });
 
     ui->notes->clear();
-    foreach (Note n, notes) {
+    for (Note &n : notes) {
         onNoteCreated(n);
     }
 
+    updateNoteSeparation();
     ui->newNoteEdit->setEnabled(true);
     ui->saveNoteButton->setEnabled(true);
     ui->notes->setEnabled(true);
@@ -249,8 +280,8 @@ void MainWindow::onListContextMenuDelete(bool)
 
         if (box.exec() == QMessageBox::Yes) {
             NoteService *ns = NoteService::getInstance();
-            QList<Note> toDelete = ns->getByList(uuid);
-            foreach (Note n, toDelete) {
+            std::list<Note> toDelete = ns->getByList(uuid);
+            for (Note n : toDelete) {
                 ns->onNoteDeleted(uuid, n.getUUID());
             }
             ListService::getInstance()->remove(uuid);
@@ -276,7 +307,7 @@ void MainWindow::onListContextMenuRename(bool)
     }
 }
 
-void MainWindow::preload()
+inline void MainWindow::preload()
 {
     QList<List> lists = ListService::getInstance()->getAll();
 
@@ -287,4 +318,27 @@ void MainWindow::preload()
     if (lists.count() > 0) {
         ui->lists->setCurrentItem(ui->lists->item(0));
     }
+}
+
+inline void MainWindow::updateNoteSeparation()
+{
+    QTimer::singleShot(0, [this](){
+        if (ui->notes->count() <= 1) {
+            noteSeparation = -1;
+        }
+
+        if (ui->notes->count() == 2) {
+            noteSeparation = 1;
+        }
+
+        int insertHere = -1;
+        for (int i = 0; i < ui->notes->count(); i++) {
+            if (ui->notes->item(i)->checkState() == Qt::Checked) {
+                insertHere = i;
+                break;
+            }
+        }
+
+        this->noteSeparation = insertHere;
+    });
 }
