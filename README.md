@@ -2,6 +2,8 @@
 
 Small **C++/Qt** (Widgets) task list application with local **SQLite** persistence.
 
+![](./images/screenshot.png)
+
 ## Features
 
 - Create, rename, and delete lists.
