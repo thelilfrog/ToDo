@@ -5,7 +5,7 @@ ARCH_KERNEL=$(uname -r | cut -d '-' -f 2)
 ARCH="${ARCH:-x86_64}"
 ARCH_KERNEL="${ARCH_KERNEL:-amd64}"
 
-QT_PLUGINS=$(qmake6 -query QT_INSTALL_PLUGINS)
+QT_PLUGINS=$(qmake6 -query QT_INSTALL_PLUGINS 2>/dev/null)
 
 WORKSPACE_DIR="$PWD"
 BUILD_DIR="$WORKSPACE_DIR/build/Desktop_Qt_6_10_3-Release"
@@ -67,7 +67,7 @@ echo "> $TMP_DIR/linuxdeploy.AppImage -e ToDo -d ../../ToDo.desktop -i ../../ico
 "$TMP_DIR/linuxdeploy.AppImage" -e ToDo -d ../../ToDo.desktop -i ../../icon.png --appdir ./appdir
 if [ $? -ne 0 ]; then
     cd appdir || exit 1
-    cp /lib/x86_64-linux-gnu/libxcb.so.1 ./usr/lib/
+    cp /lib/$ARCH-linux-gnu/libxcb.so.1 ./usr/lib/
     mv ./usr/share/icons/hicolor/512x512/apps/icon.png ./usr/share/icons/hicolor/512x512/apps/ToDo.png
     ln -s ./usr/share/icons/hicolor/512x512/apps/ToDo.png ToDo.png
     cd ..
@@ -91,7 +91,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-cp /usr/lib/x86_64-linux-gnu/libxcb-*.so "$BUILD_DIR/appdir/usr/lib/"
+cp /usr/lib/$ARCH-linux-gnu/libxcb-*.so "$BUILD_DIR/appdir/usr/lib/"
 cp $QT_PLUGINS/../lib/libQt6*.so.6 "$BUILD_DIR/appdir/usr/lib/"
 
 echo "> $TMP_DIR/appimagetool.AppImage ./appdir"

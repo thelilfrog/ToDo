@@ -56,7 +56,7 @@ linux-* {
 
     equals(QMAKE_HOST.arch, aarch64) {
         message("CPU Architecture : aarch64")
-        QMAKE_CXXFLAGS_RELEASE += -mtune=armv8.6-a+fp16+simd
+        QMAKE_CXXFLAGS_RELEASE += -march=armv8.6-a+fp16+simd
         TMP_APP_ARCH = APP_ARCH=\"\\\"aarch64\\\"\"
     }
     equals(QMAKE_HOST.arch, x86_64) || equals(QMAKE_HOST.arch, amd64) {
