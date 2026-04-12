@@ -2,9 +2,6 @@ QT += widgets sql
 
 CONFIG += c++17
 
-QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
-QMAKE_CXXFLAGS += -Werror
-
 win32:VERSION = 0.0.1.0 # major.minor.patch.build
 else:VERSION = 0.0.1    # major.minor.patch
 
@@ -36,17 +33,27 @@ macx {
     message("Build for macOS")
     ICON = icon.icns
     QMAKE_INFO_PLIST = Info.plist
+
+    QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
+    QMAKE_CXXFLAGS += -Werror
+
     QMAKE_CXXFLAGS_RELEASE -= -O
     QMAKE_CXXFLAGS_RELEASE -= -O1
     QMAKE_CXXFLAGS_RELEASE -= -O2
     QMAKE_CXXFLAGS_RELEASE *= -O3
-    QMAKE_APPLE_DEVICE_ARCHS = arm64
+
     QMAKE_CXXFLAGS_RELEASE += -march=armv8.6-a+fp16+simd
+    QMAKE_APPLE_DEVICE_ARCHS = arm64
+
     TMP_APP_ARCH = APP_ARCH=\"\\\"arm64\\\"\"
 }
 
 linux-* {
     message("Build for Linux")
+
+    QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
+    QMAKE_CXXFLAGS += -Werror
+
     equals(QMAKE_HOST.arch, aarch64) {
         message("CPU Architecture : aarch64")
         QMAKE_CXXFLAGS_RELEASE += -mtune=armv8.6-a+fp16+simd
