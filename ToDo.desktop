@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ToDo
+Comment=Lightweight Qt Todo app
+TryExec=Todo
+Exec=ToDo %F
+Icon=ToDo
+Categories=KDE;Qt;ProjectManagement;Office
