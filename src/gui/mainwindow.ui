@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>ToDo</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
@@ -75,14 +79,16 @@
           <property name="font">
            <font>
             <pointsize>28</pointsize>
-            <fontweight>DemiBold</fontweight>
+            <fontweight>ExtraLight</fontweight>
            </font>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(119, 167, 92);
+color: rgb(249, 255, 251);
 border: none;
 padding-left: 2px;
-border-bottom: 2px solid rgb(242, 242, 242)</string>
+border-bottom: 2px solid rgb(242, 242, 242);
+font-weight: 200;</string>
           </property>
           <property name="lineWidth">
            <number>0</number>
@@ -208,12 +214,31 @@ QListView::item:hover {
             <number>0</number>
            </property>
            <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Minimum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>6</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QLabel" name="version">
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="styleSheet">
+              <string notr="true">color: rgb(74, 104, 57);</string>
+             </property>
              <property name="text">
-              <string>0.0.1</string>
+              <string>0.0.0-dev</string>
              </property>
             </widget>
            </item>
@@ -368,7 +393,7 @@ padding: 8px;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset theme="QIcon::ThemeIcon::MailSend"/>
+             <iconset theme="QIcon::ThemeIcon::DocumentSend"/>
             </property>
             <property name="flat">
              <bool>false</bool>
@@ -399,7 +424,76 @@ padding: 8px;</string>
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1032</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(119, 167, 92);
+color: rgb(249, 255, 251);
+font-weight: 200;</string>
+   </property>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuFichier">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_list"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <addaction name="menuFichier"/>
+   <addaction name="menuAbout"/>
+  </widget>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::HelpAbout"/>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionNew_list">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentNew"/>
+   </property>
+   <property name="text">
+    <string>New list...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ApplicationExit"/>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::QuitRole</enum>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

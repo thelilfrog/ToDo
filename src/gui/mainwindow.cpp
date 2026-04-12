@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "src/gui/dialog/input/inputdialog.h"
+#include "src/gui/dialog/about/aboutdialog.h"
 #include "src/core/listservice.h"
 #include "src/core/noteservice.h"
 
@@ -16,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->version->setText(QString("%1").arg(APP_VERSION));
+
     /*
      * Events
      */
@@ -27,6 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->newNoteEdit, &QLineEdit::returnPressed, this, &MainWindow::onNewNoteEditReturnPressed);
     connect(ui->saveNoteButton, &QPushButton::clicked, this, &MainWindow::onSaveNoteButtonClicked);
     connect(ui->notes, &QListWidget::itemChanged, this, &MainWindow::onNoteChanged);
+
+    // action menu
+    connect(ui->actionNew_list, &QAction::triggered, this, &MainWindow::openCreateListDialog);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::openAboutDialog);
+    connect(ui->actionClose, &QAction::triggered, this, &MainWindow::quit);
 
     // services
     connect(ListService::getInstance(), &ListService::onListCreated, this, &MainWindow::onListCreated);
@@ -57,6 +65,12 @@ void MainWindow::openCreateListDialog(bool)
 
     QString newListName = d.getInput();
     ListService::getInstance()->create(newListName);
+}
+
+void MainWindow::openAboutDialog()
+{
+    AboutDialog d(this);
+    d.exec();
 }
 
 void MainWindow::onListCreated(List value)
@@ -305,6 +319,11 @@ void MainWindow::onListContextMenuRename(bool)
         QString newListName = d.getInput();
         ListService::getInstance()->update(item->data(Qt::UserRole).toUuid(), newListName);
     }
+}
+
+void MainWindow::quit()
+{
+    QApplication::closeAllWindows();
 }
 
 inline void MainWindow::preload()

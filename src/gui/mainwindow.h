@@ -23,6 +23,7 @@ public:
 
 private slots:
     void openCreateListDialog(bool);
+    void openAboutDialog();
     void onListCreated(List value);
     void onListUpdate(List value);
     void onListDeleted(QUuid uuid);
@@ -36,6 +37,7 @@ private slots:
     void onListRightClick(const QPoint &pos);
     void onListContextMenuDelete(bool);
     void onListContextMenuRename(bool);
+    void quit();
 
 private:
     Ui::MainWindow *ui;

@@ -8,6 +8,9 @@ QMAKE_CXXFLAGS += -Werror
 win32:VERSION = 0.0.1.0 # major.minor.patch.build
 else:VERSION = 0.0.1    # major.minor.patch
 
+DEFINES += APP_VERSION=\"\\\"$${VERSION}.preview1\\\"\"
+TMP_APP_ARCH = APP_ARCH=\"\\\"unknown\\\"\"
+
 # remove possible other optimization flags
 win32 {
     message("Build for Windows")
@@ -16,10 +19,12 @@ win32 {
     QMAKE_CXXFLAGS_RELEASE *= -O2
     equals(QMAKE_TARGET.arch, arm64) {
         message("CPU Architecture : aarch64")
+        TMP_APP_ARCH = APP_ARCH=\"\\\"arm64\\\"\"
     }
     equals(QMAKE_TARGET.arch, x86_64) {
         message("CPU Architecture : x64")
         QMAKE_CXXFLAGS_RELEASE += -favor:INTEL64
+        TMP_APP_ARCH = APP_ARCH=\"\\\"x64\\\"\"
     }
     RC_ICONS = icon.ico
     QMAKE_TARGET_COMPANY = "Aurelie Delhaie"
@@ -37,21 +42,26 @@ macx {
     QMAKE_CXXFLAGS_RELEASE *= -O3
     QMAKE_APPLE_DEVICE_ARCHS = arm64
     QMAKE_CXXFLAGS_RELEASE += -march=armv8.6-a+fp16+simd
+    TMP_APP_ARCH = APP_ARCH=\"\\\"arm64\\\"\"
 }
 
 linux-* {
     message("Build for Linux")
-    equals(ARCH, aarch64) {
+    equals(QMAKE_HOST.arch, aarch64) {
         message("CPU Architecture : aarch64")
         QMAKE_CXXFLAGS_RELEASE += -mtune=armv8.6-a+fp16+simd
+        TMP_APP_ARCH = APP_ARCH=\"\\\"aarch64\\\"\"
     }
-    equals(ARCH, amd64) {
+    equals(QMAKE_HOST.arch, amd64) {
         message("CPU Architecture : amd64")
         QMAKE_CXXFLAGS_RELEASE += -march=tigerlake
         QMAKE_CXXFLAGS_RELEASE += -mtune=intel
+        TMP_APP_ARCH = APP_ARCH=\"\\\"amd64\\\"\"
     }
     QMAKE_CXXFLAGS_RELEASE *= -O3
 }
+
+DEFINES += $$TMP_APP_ARCH
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -59,6 +69,7 @@ linux-* {
 
 SOURCES += \
     src/core/noteservice.cpp \
+    src/gui/dialog/about/aboutdialog.cpp \
     src/gui/dialog/input/inputdialog.cpp \
     src/obj/list.cpp \
     src/core/listservice.cpp \
@@ -68,6 +79,7 @@ SOURCES += \
 
 HEADERS += \
     src/core/noteservice.h \
+    src/gui/dialog/about/aboutdialog.h \
     src/gui/dialog/input/inputdialog.h \
     src/obj/list.h \
     src/core/listservice.h \
@@ -75,6 +87,7 @@ HEADERS += \
     src/obj/note.h
 
 FORMS += \
+    src/gui/dialog/about/aboutdialog.ui \
     src/gui/dialog/input/inputdialog.ui \
     src/gui/mainwindow.ui
 
@@ -87,3 +100,6 @@ CONFIG += embed_translations
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    src/resources.qrc
